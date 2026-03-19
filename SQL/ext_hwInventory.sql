@@ -106,9 +106,18 @@ SELECT
         WHEN f.SecureBoot_Raw IS NULL THEN 'Unknown'
         ELSE CAST(f.SecureBoot_Raw AS nvarchar(20))
     END											AS [Secure Boot enabled],
-	sb.availableUpdates,
-	sbs.WindowsUEFICA2023Capable,
-	sbs.confidenceLevel,
+	Case sb.availableUpdates
+		When 0 then 'false'
+		When 1 then 'true'
+	else
+		'Unknown or n/a'
+	end as [availableUpdates CA2023],
+	Case sbs.WindowsUEFICA2023Capable
+		When 0 then 'No'
+		When 1 then 'Yes'
+	else
+		'Unknown or n/a'
+	end as WindowsUEFICA2023Capable,
 	sbs.UEFICA2023Status,
 
     /* Virtual machine (prefer the native flag; fallback to heuristic if null) */

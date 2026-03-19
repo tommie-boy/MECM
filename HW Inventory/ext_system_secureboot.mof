@@ -1,0 +1,8 @@
+#pragma namespace ("\\\\.\\root\\cimv2\\SMS")
+#pragma deleteclass("ext_system_secureboot", NOFAIL)
+[SMS_Report(TRUE),SMS_Group_Name("ext_system_secureboot"),SMS_Class_ID("ext_system_secureboot")]
+Class ext_system_secureboot: SMS_Class_Template
+{
+[SMS_Report(TRUE),key] string KeyName;
+[SMS_Report(TRUE)] Uint32 AvailableUpdates;
+};

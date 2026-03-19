@@ -43,7 +43,8 @@ $dbdefaultCertUpdated = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootU
  
 $dbCertUpdated = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI db).bytes)
 
-$result += 1 | select-object @{n='biosConfiguration';e={ "$($computerInfo.BiosFirmwareType)" }}, `
+$result += 1 | select-object @{n='computerName';e={ "$($env:computername)" }}, `
+                      @{n='biosConfiguration';e={ "$($computerInfo.BiosFirmwareType)" }}, `
                       @{n='secureboot';e={ "$secureBoot" }}, `
                       @{n='bitlockerActive';e={ "$bitlockerActive" }}, `
                       @{n='SecureBootUpdateAvailable';e={ "$secureBootUpdateAvailable" }}, `

@@ -24,13 +24,14 @@ Once you get the below confirmation box, click import again:
 
 <img width="530" height="589" alt="image" src="https://github.com/user-attachments/assets/2d4f0fc6-508b-446d-bd51-fa341dc9321d" />
 
-<img width="532" height="590" alt="image" src="https://github.com/user-attachments/assets/baf9de1c-42e6-43c3-9011-e7d78dfa57f2" />
+Repeat the same process for ext_system_secureboot_servicing.mof. Once done you should have 2 additional classes added:
 
-Repeat the same process for ext_system_secureboot_servicing.mof.
+<img width="680" height="588" alt="image" src="https://github.com/user-attachments/assets/19577bcd-e2cb-4e03-a99c-058a3c855dd3" />
+
 
 The tables and views in MECM will be created once the first devices start to update your hardware inventory (hint: you can force this process by sending 
-1. download a computer policy
-2. a client notification to collect a fresh set of the current hardware inventory:
+1. download computer policy
+2. client notification to collect a fresh set of the current hardware inventory:
 
 <img width="607" height="127" alt="image" src="https://github.com/user-attachments/assets/5b5aaff5-069f-4fbf-817a-2deffb2d020e" />
 

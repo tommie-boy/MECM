@@ -1,7 +1,7 @@
 $result = $null
-$computerInfo = Get-ComputerInfo | select-object BiosFirmwareType, OsName
+$computerInfo = Get-ComputerInfo | select-object BiosFirmwareType, CsManufacturer, CsModel, WindowsProductName
 $secureBoot = if(confirm-securebootuefi -ea SilentlyContinue) { "Enabled" } else { "Disabled" } 
-$bitlockerInfo = Get-Bitlockervolume -ea silentlycontinue
+$bitlockerInfo = if(get-command Get-Bitlockervolume -ea silentlycontinue) { Get-Bitlockervolume -ea silentlycontinue }
 $bitlockerActive = if($bitlockerInfo.ProtectionStatus -match 'On') { $true } else { $false } 
 $kekCertificate = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI KEK).bytes)
 $dbdefaultCertificate = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI dbdefault).bytes)
@@ -31,35 +31,35 @@ if(test-path $regKey2) {
 }
 
 $allEventIds = @(1801,1808)
-
 $events = @(Get-WinEvent -FilterHashtable @{LogName='System'; ID=$allEventIds} -MaxEvents 2000 -ErrorAction SilentlyContinue)
-        
 $latest_1801_Event = $events | Where-Object {$_.Id -eq 1801} | Sort-Object TimeCreated -Descending | Select-Object -First 1
 $latest_1808_Event = $events | Where-Object {$_.Id -eq 1808} | Sort-Object TimeCreated -Descending | Select-Object -First 1
 
 $kekUpdated = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI KEK).bytes)
- 
 $dbdefaultCertUpdated = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI dbdefault).bytes)
- 
 $dbCertUpdated = [System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI db).bytes)
 
 $result += 1 | select-object @{n='computerName';e={ "$($env:computername)" }}, `
-                      @{n='biosConfiguration';e={ "$($computerInfo.BiosFirmwareType)" }}, `
-                      @{n='secureboot';e={ "$secureBoot" }}, `
-                      @{n='bitlockerActive';e={ "$bitlockerActive" }}, `
-                      @{n='SecureBootUpdateAvailable';e={ "$secureBootUpdateAvailable" }}, `
-                      @{n='WindowsUEFICA2023Capable';e={ "$secureBootUpdateServicingWindowsUEFICA2023Capable" }}, `
-                      @{n='UEFICA2023Status';e={ "$secureBootUpdateServicingUEFICA2023Status" }}, `
-                      @{n='UEFICA2023Error';e={ "$secureBootUpdateServicingUEFICA2023Error" }}, `
-                      @{n='UEFICA2023ErrorEvent';e={ "$secureBootUpdateServicingUEFICA2023ErrorEvent" }}, `
-                      @{n='Event1801Time';e={ if($latest_1801_Event) { $($latest_1801_Event.TimeCreated) } else { "N/a" } }}, `
-                      @{n='Event1801Status';e={ if($latest_1801_Event) { $latest_1801_Event.LevelDisplayName } else { "N/a" } }}, `
-                      @{n='KEK Certificate';e={ if($kekUpdated -match 'Microsoft Corporation KEK 2K CA 2023') { 'Microsoft Corporation KEK 2K CA 2023' } elseif($kekUpdated -match 'Microsoft Corporation KEK CA 2011') { 'Microsoft Corporation KEK 2K CA 2011' } else { "N/a" } }}, `
-                      @{n='DBDefault Certificate PCA 2011';e={ if($dbdefaultCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbdefaultCertUpdated -match 'Microsoft Windows Production PCA 2011') { 'Microsoft Windows Production PCA 2011' } else { "N/a" } }}, `
-                      @{n='DBDefault Certificate CA 2011';e={ if($dbdefaultCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbdefaultCertUpdated -match 'Microsoft Corporation UEFI CA 2011') { 'Microsoft Corporation UEFI CA 2011' } else { "N/a" } }}, `
-                      @{n='DB Certificate PCA 2011';e={ if($dbCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbCertUpdated -match 'Microsoft Windows Production PCA 2011') { 'Microsoft Windows Production PCA 2011' } else { "N/a" } }}, `
-                      @{n='DB Certificate CA 2011';e={ if($dbCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbCertUpdated -match 'Microsoft Corporation UEFI CA 2011') { 'Microsoft Corporation UEFI CA 2011' } else { "N/a" } }}, `
-                      @{n='Event1808Time';e={ if($latest_1808_Event) { $($latest_1808_Event.TimeCreated) } else { "N/a" } }}, `
-                      @{n='Event1808Status';e={ if($latest_1808_Event) { $latest_1808_Event.LevelDisplayName } else { "N/a" } }}
+                                @{n='Manufacturer';e={ "$($computerInfo.CsManufacturer)" }}, `
+                                @{n='Model';e={ "$($computerInfo.CsModel)" }}, `
+                                @{n='biosConfiguration';e={ "$($computerInfo.BiosFirmwareType)" }}, `
+                                @{n='secureboot';e={ "$secureBoot" }}, `
+                                @{n='operatingSystem';e={ "$($computerInfo.WindowsProductName)" }}, 
+                                @{n='bitlockerActive';e={ "$bitlockerActive" }}, `
+                                @{n='SecureBootUpdateAvailable';e={ "$secureBootUpdateAvailable" }}, `
+                                @{n='WindowsUEFICA2023Capable';e={ "$secureBootUpdateServicingWindowsUEFICA2023Capable" }}, `
+                                @{n='UEFICA2023Status';e={ "$secureBootUpdateServicingUEFICA2023Status" }}, `
+                                @{n='UEFICA2023Error';e={ "$secureBootUpdateServicingUEFICA2023Error" }}, `
+                                @{n='UEFICA2023ErrorEvent';e={ "$secureBootUpdateServicingUEFICA2023ErrorEvent" }}, `
+                                @{n='Event1801Time';e={ if($latest_1801_Event) { $($latest_1801_Event.TimeCreated) } else { "N/a" } }}, `
+                                @{n='Event1801Status';e={ if($latest_1801_Event) { $latest_1801_Event.LevelDisplayName } else { "N/a" } }}, `
+                                @{n='Secure Boot KEK Certificate';e={ if($kekUpdated -match 'Microsoft Corporation KEK 2K CA 2023') { 'Microsoft Corporation KEK 2K CA 2023' } elseif($kekUpdated -match 'Microsoft Corporation KEK CA 2011') { 'Microsoft Corporation KEK 2K CA 2011' } else { "N/a" } }}, `
+                                @{n='Secure Boot DBDefault Cert PCA 2011';e={ if($dbdefaultCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbdefaultCertUpdated -match 'Microsoft Windows Production PCA 2011') { 'Microsoft Windows Production PCA 2011' } else { "N/a" } }}, `
+                                @{n='Secure Boot DBDefault Cert CA 2011';e={ if($dbdefaultCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbdefaultCertUpdated -match 'Microsoft Corporation UEFI CA 2011') { 'Microsoft Corporation UEFI CA 2011' } else { "N/a" } }}, `
+                                @{n='Secure Boot DB Cert PCA 2011';e={ if($dbCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbCertUpdated -match 'Microsoft Windows Production PCA 2011') { 'Microsoft Windows Production PCA 2011' } else { "N/a" } }}, `
+                                @{n='Secure Boot DB Cert CA 2011';e={ if($dbCertUpdated -match 'Windows UEFI CA 2023') { 'Updated to Windows UEFI CA 2023' } elseif($dbCertUpdated -match 'Microsoft Corporation UEFI CA 2011') { 'Microsoft Corporation UEFI CA 2011' } else { "N/a" } }}, `
+                                @{n='Event1808Time';e={ if($latest_1808_Event) { $($latest_1808_Event.TimeCreated) } else { "N/a" } }}, `
+                                @{n='Event1808Status';e={ if($latest_1808_Event) { $latest_1808_Event.LevelDisplayName } else { "N/a" } }}
+
 
 $result

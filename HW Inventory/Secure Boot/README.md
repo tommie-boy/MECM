@@ -2,7 +2,7 @@
 
 ### `add_configuration.mof`
 
-Open your configuration.mof file located here in <CM install directory>\inboxes\clifiles.src\hinv, and scroll to the bottom of the configuration.mof file where you'll find the below comments
+Open your configuration.mof file located in <CM install directory>\inboxes\clifiles.src\hinv, and scroll to the bottom of the configuration.mof file. Add the contents of add_configuration.mof per below:
 
 <img width="1489" height="1011" alt="image" src="https://github.com/user-attachments/assets/ad328a99-395f-4f41-8f5c-3381a18c939b" />
 
